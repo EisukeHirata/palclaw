@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getServiceStatus } from "@/lib/render";
+import { getServiceStatus } from "@/lib/railway";
 
 export async function GET(
   _request: Request,
@@ -28,7 +28,7 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  // Poll Render for live status if we have a service ID
+  // Poll Railway for live status if we have a service ID
   if (deployment.render_service_id && deployment.status === "deploying") {
     const liveStatus = await getServiceStatus(deployment.render_service_id);
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createOpenclaw } from "@/lib/render";
+import { createOpenclaw } from "@/lib/railway";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
