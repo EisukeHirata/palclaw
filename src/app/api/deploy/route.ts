@@ -14,10 +14,14 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { channel, model } = body as { channel: string; model: string };
+  const { channel, model, botToken } = body as { channel: string; model: string; botToken?: string };
 
   if (!channel || !model) {
     return NextResponse.json({ error: "channel and model are required" }, { status: 400 });
+  }
+
+  if (channel === "telegram" && !botToken) {
+    return NextResponse.json({ error: "botToken is required for Telegram" }, { status: 400 });
   }
 
   // Save deployment as pending
@@ -42,6 +46,7 @@ export async function POST(request: Request) {
       channel,
       model,
       userId: user.id,
+      botToken,
     });
 
     const { error: updateError } = await supabase

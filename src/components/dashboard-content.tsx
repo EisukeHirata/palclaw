@@ -82,6 +82,17 @@ export function DashboardContent({
     return () => clearInterval(interval);
   }, [liveDeployments]);
 
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this deployment? This will shut down the Railway service and remove all associated agents.")) return;
+    try {
+      const res = await fetch(`/api/deploy/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete");
+      setLiveDeployments((prev) => prev.filter((d) => d.id !== id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Delete failed");
+    }
+  }
+
   const runningCount = liveDeployments.filter((d) => d.status === "running").length;
   const deployingCount = liveDeployments.filter((d) => d.status === "deploying" || d.status === "pending").length;
 
@@ -206,8 +217,18 @@ export function DashboardContent({
                       <Progress value={30} />
                     </div>
                   )}
-                  <div className="mt-3 text-xs text-muted-foreground">
-                    Deployed {new Date(d.created_at).toLocaleDateString()}
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      Deployed {new Date(d.created_at).toLocaleDateString()}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+                      onClick={() => handleDelete(d.id)}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

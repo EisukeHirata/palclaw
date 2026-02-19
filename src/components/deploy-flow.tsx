@@ -16,7 +16,7 @@ type Model = "claude" | "gpt" | "gemini";
 
 const CHANNELS: { id: Channel; name: string; icon: string; description: string; available: boolean }[] = [
   { id: "telegram", name: "Telegram", icon: "✈️", description: "Most popular. Easy bot setup.", available: true },
-  { id: "whatsapp", name: "WhatsApp", icon: "💬", description: "Connect via WhatsApp Business.", available: true },
+  { id: "whatsapp", name: "WhatsApp", icon: "💬", description: "Connect via WhatsApp Business.", available: false },
 ];
 
 const MODELS: { id: Model; name: string; icon: string; description: string; provider: string }[] = [
@@ -25,13 +25,36 @@ const MODELS: { id: Model; name: string; icon: string; description: string; prov
   { id: "gemini", name: "Gemini 2.0 Flash", icon: "💡", description: "Great for multilingual tasks", provider: "Google" },
 ];
 
+const TOTAL_STEPS = 4;
+
 export function DeployFlow({ user }: DeployFlowProps) {
   const [step, setStep] = useState(1);
   const [channel, setChannel] = useState<Channel | null>(null);
+  const [botToken, setBotToken] = useState("");
+  const [botTokenError, setBotTokenError] = useState<string | null>(null);
   const [model, setModel] = useState<Model>("claude");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  function validateBotToken(token: string): string | null {
+    if (!token.trim()) return "Bot token is required";
+    // Telegram bot tokens look like: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+    if (!/^\d+:[A-Za-z0-9_-]{35,}$/.test(token.trim())) {
+      return "Invalid format. Should look like: 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz";
+    }
+    return null;
+  }
+
+  function handleConnectNext() {
+    const err = validateBotToken(botToken);
+    if (err) {
+      setBotTokenError(err);
+      return;
+    }
+    setBotTokenError(null);
+    setStep(3);
+  }
 
   async function handleGoogleSignIn() {
     const supabase = createClient();
@@ -58,7 +81,7 @@ export function DeployFlow({ user }: DeployFlowProps) {
       const res = await fetch("/api/deploy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ channel, model }),
+        body: JSON.stringify({ channel, model, botToken: botToken.trim() }),
       });
 
       const data = await res.json();
@@ -79,13 +102,13 @@ export function DeployFlow({ user }: DeployFlowProps) {
     <section id="deploy" className="bg-white px-4 py-20 sm:px-6">
       <div className="mx-auto max-w-3xl">
         <div className="mb-12 text-center">
-          <h2 className="mb-3 text-3xl font-bold sm:text-4xl">Deploy in 3 Steps</h2>
+          <h2 className="mb-3 text-3xl font-bold sm:text-4xl">Deploy in 4 Steps</h2>
           <p className="text-muted-foreground">No servers. No config. Just deploy.</p>
         </div>
 
         {/* Step indicator */}
         <div className="mb-10 flex items-center justify-center gap-2">
-          {[1, 2, 3].map((s) => (
+          {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((s) => (
             <div key={s} className="flex items-center gap-2">
               <div
                 className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition-colors ${
@@ -96,9 +119,9 @@ export function DeployFlow({ user }: DeployFlowProps) {
               >
                 {s}
               </div>
-              {s < 3 && (
+              {s < TOTAL_STEPS && (
                 <div
-                  className={`h-0.5 w-12 transition-colors sm:w-20 ${
+                  className={`h-0.5 w-10 transition-colors sm:w-16 ${
                     step > s ? "bg-primary" : "bg-border"
                   }`}
                 />
@@ -112,18 +135,18 @@ export function DeployFlow({ user }: DeployFlowProps) {
           <div>
             <h3 className="mb-2 text-center text-xl font-semibold">Choose your channel</h3>
             <p className="mb-6 text-center text-sm text-muted-foreground">
-              Where should your AI coach reach you?
+              Where should your AI agent reach you?
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               {CHANNELS.map((ch) => (
                 <button
                   key={ch.id}
-                  onClick={() => setChannel(ch.id)}
+                  onClick={() => !ch.available ? undefined : setChannel(ch.id)}
                   className={`rounded-xl border-2 p-5 text-left transition-all hover:shadow-md ${
                     channel === ch.id
                       ? "border-primary bg-violet-50"
                       : "border-border bg-white hover:border-primary/40"
-                  } ${!ch.available ? "opacity-50 cursor-not-allowed" : ""}`}
+                  } ${!ch.available ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                   disabled={!ch.available}
                 >
                   <div className="mb-2 text-3xl">{ch.icon}</div>
@@ -139,14 +162,81 @@ export function DeployFlow({ user }: DeployFlowProps) {
             </div>
             <div className="mt-6 flex justify-end">
               <Button onClick={() => setStep(2)} disabled={!channel}>
-                Next: Choose Model →
+                Next: Connect →
               </Button>
             </div>
           </div>
         )}
 
-        {/* Step 2: Model */}
+        {/* Step 2: Connect Channel */}
         {step === 2 && (
+          <div>
+            <h3 className="mb-2 text-center text-xl font-semibold">
+              Connect {CHANNELS.find((c) => c.id === channel)?.name}
+            </h3>
+            <p className="mb-6 text-center text-sm text-muted-foreground">
+              Paste your bot token to link your Telegram bot.
+            </p>
+
+            {channel === "telegram" && (
+              <Card className="mb-6">
+                <CardContent className="pt-6">
+                  <h4 className="mb-3 font-semibold text-sm">How to get your bot token</h4>
+                  <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
+                    <li>
+                      Open Telegram and go to{" "}
+                      <span className="font-mono text-foreground">@BotFather</span>
+                    </li>
+                    <li>
+                      Start a chat and type{" "}
+                      <span className="font-mono text-foreground">/newbot</span>
+                    </li>
+                    <li>Follow the prompts to name your bot and choose a username</li>
+                    <li>
+                      BotFather will send you a <strong>bot token</strong>. Copy the entire token.
+                    </li>
+                  </ol>
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="mb-6">
+              <label className="mb-1.5 block text-sm font-medium" htmlFor="bot-token">
+                Bot token
+              </label>
+              <input
+                id="bot-token"
+                type="text"
+                value={botToken}
+                onChange={(e) => {
+                  setBotToken(e.target.value);
+                  if (botTokenError) setBotTokenError(null);
+                }}
+                placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"
+                className={`w-full rounded-lg border px-4 py-2.5 font-mono text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 ${
+                  botTokenError ? "border-red-400 bg-red-50" : "border-border bg-white"
+                }`}
+                autoComplete="off"
+                spellCheck={false}
+              />
+              {botTokenError && (
+                <p className="mt-1.5 text-xs text-red-600">{botTokenError}</p>
+              )}
+            </div>
+
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={() => setStep(1)}>
+                ← Back
+              </Button>
+              <Button onClick={handleConnectNext}>
+                Save & Connect →
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Model */}
+        {step === 3 && (
           <div>
             <h3 className="mb-2 text-center text-xl font-semibold">Choose your AI model</h3>
             <p className="mb-6 text-center text-sm text-muted-foreground">
@@ -171,18 +261,18 @@ export function DeployFlow({ user }: DeployFlowProps) {
               ))}
             </div>
             <div className="mt-6 flex justify-between">
-              <Button variant="outline" onClick={() => setStep(1)}>
+              <Button variant="outline" onClick={() => setStep(2)}>
                 ← Back
               </Button>
-              <Button onClick={() => setStep(3)}>
+              <Button onClick={() => setStep(4)}>
                 Next: Deploy →
               </Button>
             </div>
           </div>
         )}
 
-        {/* Step 3: Deploy */}
-        {step === 3 && (
+        {/* Step 4: Deploy */}
+        {step === 4 && (
           <div>
             <h3 className="mb-2 text-center text-xl font-semibold">Ready to deploy!</h3>
             <p className="mb-6 text-center text-sm text-muted-foreground">
@@ -200,6 +290,12 @@ export function DeployFlow({ user }: DeployFlowProps) {
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Bot token</span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {botToken.slice(0, 10)}••••••••
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">AI Model</span>
                     <span className="font-medium">
                       {MODELS.find((m) => m.id === model)?.name}
@@ -207,11 +303,11 @@ export function DeployFlow({ user }: DeployFlowProps) {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Hosting</span>
-                    <span className="font-medium">Render (Docker)</span>
+                    <span className="font-medium">Railway (Docker)</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Deploy time</span>
-                    <span className="font-medium text-green-600">~60 seconds</span>
+                    <span className="font-medium text-green-600">~2 minutes</span>
                   </div>
                 </div>
               </CardContent>
@@ -257,7 +353,7 @@ export function DeployFlow({ user }: DeployFlowProps) {
             </div>
 
             <div className="mt-4 flex justify-start">
-              <Button variant="ghost" size="sm" onClick={() => setStep(2)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(3)}>
                 ← Back
               </Button>
             </div>
