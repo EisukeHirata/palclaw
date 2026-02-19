@@ -37,13 +37,12 @@ export async function createOpenclaw(
     type: "web_service",
     name: serviceName,
     ownerId: process.env.RENDER_OWNER_ID,
-    image: {
-      imagePath: process.env.RENDER_OPENCLAW_IMAGE || "docker.io/openclaw/openclaw:latest",
-    },
+    repo: process.env.RENDER_OPENCLAW_REPO || "https://github.com/openclaw/openclaw",
+    branch: "main",
     serviceDetails: {
       plan: "starter",
       region: "oregon",
-      env: "image",
+      env: "docker",
       numInstances: 1,
       healthCheckPath: "/",
     },
