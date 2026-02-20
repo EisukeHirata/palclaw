@@ -102,8 +102,8 @@ export function DeployFlow({ user }: DeployFlowProps) {
     <section id="deploy" className="bg-white px-4 py-20 sm:px-6">
       <div className="mx-auto max-w-3xl">
         <div className="mb-12 text-center">
-          <h2 className="mb-3 text-3xl font-bold sm:text-4xl">Deploy in 4 Steps</h2>
-          <p className="text-muted-foreground">No servers. No config. Just deploy.</p>
+          <h2 className="mb-3 text-3xl font-bold sm:text-4xl">Get Your Coach Setup</h2>
+          <p className="text-muted-foreground">Select your preferences. Your personalized agent will be ready instantly.</p>
         </div>
 
         {/* Step indicator */}

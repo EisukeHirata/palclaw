@@ -1,10 +1,9 @@
 const ROWS = [
-  { label: "Deploy time", palclaw: "< 60 seconds", manual: "60+ minutes" },
-  { label: "Server setup", palclaw: "✅ Automated", manual: "❌ Manual SSH + config" },
-  { label: "Openclaw install", palclaw: "✅ Pre-installed", manual: "❌ npm install + setup" },
-  { label: "Channel config", palclaw: "✅ 1-click", manual: "❌ API keys + webhooks" },
-  { label: "Updates", palclaw: "✅ Managed", manual: "❌ Manual" },
-  { label: "Monitoring", palclaw: "✅ Dashboard", manual: "❌ Self-managed" },
+  { label: "Proactivity", palclaw: "✅ Proactive (HEARTBEAT nudges)", manual: "❌ Passive (Waits for prompts)" },
+  { label: "Memory", palclaw: "✅ Structured goals & weaknesses", manual: "❌ Limited context window" },
+  { label: "Personality", palclaw: "✅ Deeply customized (SOUL.md)", manual: "❌ One-size-fits-all" },
+  { label: "Privacy", palclaw: "✅ 100% Private (Self-hosted)", manual: "❌ Cloud data collection" },
+  { label: "Focus", palclaw: "✅ Your personal growth", manual: "❌ General assistance" },
 ];
 
 export function ComparisonTable() {
@@ -13,10 +12,10 @@ export function ComparisonTable() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center">
           <h2 className="mb-3 text-3xl font-bold sm:text-4xl">
-            Palclaw vs. Manual Setup
+            Openclaw Coach vs. Generic AI
           </h2>
           <p className="text-muted-foreground">
-            Why spend an hour on DevOps when you could spend it learning?
+            Why settle for a generic assistant when you can have a dedicated coach?
           </p>
         </div>
 

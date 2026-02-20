@@ -1,39 +1,39 @@
 const FEATURES = [
   {
-    icon: "⚡",
-    title: "1-Click Deploy",
+    icon: "🎭",
+    title: "Dynamic Personality",
     description:
-      "No servers, no SSH, no config files. Select your channel and model, hit deploy. Your AI coach is live in under 60 seconds.",
+      "Configure your agent's SOUL to be a strict coach, a gentle mentor, or anything in between. It adapts to your preferred learning style.",
+  },
+  {
+    icon: "💓",
+    title: "Proactive Check-ins",
+    description:
+      "Your agent doesn't just wait for prompts. It uses its HEARTBEAT to autonomously send scheduled nudges, review reminders, and progress reports.",
+  },
+  {
+    icon: "🧠",
+    title: "Structured Long-term Memory",
+    description:
+      "Never repeat yourself. Your agent retains your goals, deadlines, and weaknesses across all sessions in its MEMORY.",
   },
   {
     icon: "🎯",
-    title: "Learning-Focused",
+    title: "Learning-Specific Skills",
     description:
-      "Built on Openclaw's powerful agent system. Preconfigured for study sessions, goal tracking, spaced repetition, and daily check-ins.",
-  },
-  {
-    icon: "📱",
-    title: "Chat Where You Are",
-    description:
-      "Works directly in Telegram and WhatsApp. No new apps to install — your AI coach lives in the messenger you already use.",
+      "Built-in tools for spaced repetition, daily goal tracking, and detailed weakness analysis to accelerate your growth.",
   },
   {
     icon: "🔒",
     title: "Private & Secure",
     description:
-      "Each deployment is isolated in its own container. Your conversations and data never leave your own Render instance.",
+      "Your personal growth data is yours. Each deployment is isolated, ensuring your conversations never leave your own instance.",
   },
   {
-    icon: "🤖",
-    title: "Powered by Top AI",
+    icon: "📱",
+    title: "Chat Where You Are",
     description:
-      "Choose Claude, GPT-4o, or Gemini as your model. Switch anytime from the dashboard without redeploying.",
-  },
-  {
-    icon: "📈",
-    title: "Progress Tracking",
-    description:
-      "Your agent remembers your goals, tracks streaks, and sends proactive nudges when you need them most.",
+      "Seamless integration with Telegram (WhatsApp coming soon). Your trusted coach is always in your pocket, right where you already chat.",
   },
 ];
 
@@ -43,10 +43,10 @@ export function FeaturesSection() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 text-center">
           <h2 className="mb-3 text-3xl font-bold sm:text-4xl">
-            Everything you need to grow
+            A coach that truly understands you
           </h2>
           <p className="mx-auto max-w-2xl text-muted-foreground">
-            Palclaw handles all the infrastructure so you can focus on learning.
+            More than just a chatbot. Palclaw empowers you with Openclaw's deep personalization features.
           </p>
         </div>
 

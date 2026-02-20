@@ -15,19 +15,19 @@ export function HeroSection() {
 
       <div className="mx-auto max-w-4xl text-center">
         <Badge className="mb-6 inline-flex bg-violet-100 text-violet-700 border-violet-200">
-          🚀 Deploy in under 60 seconds
+          🌱 Your Personal Growth Engine
         </Badge>
 
         <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
-          Your AI Companion for{" "}
+          Meet Your AI Coach for{" "}
           <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-            Learning & Habits
+            Self-Improvement
           </span>
         </h1>
 
         <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-          Deploy Openclaw — a self-hosted AI agent — directly to Telegram or WhatsApp with one click.
-          No servers, no SSH, no config. Just a personal AI coach ready to help you achieve your goals.
+          Deploy Openclaw — your private, self-hosted AI companion — directly to Telegram.
+          Customize its personality (SOUL), set long-term goals (MEMORY), and let it proactively coach you (HEARTBEAT).
         </p>
 
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
