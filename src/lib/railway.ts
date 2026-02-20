@@ -28,16 +28,16 @@ export function generateToken(): string {
 
 // Our model id → openclaw model name
 const MODEL_NAMES: Record<string, string> = {
-  claude: "claude-sonnet-4-6",
-  gpt: "gpt-4o",
-  gemini: "gemini-2.0-flash",
+  claude: "anthropic/claude-sonnet-4-6",
+  gpt: "openai/gpt-4o",
+  gemini: "google/gemini-2.0-flash",
 };
 
 // Our model id → env var name for the API key
 const MODEL_API_KEY_ENV: Record<string, string> = {
   claude: "ANTHROPIC_API_KEY",
   gpt: "OPENAI_API_KEY",
-  gemini: "GOOGLE_API_KEY",
+  gemini: "GEMINI_API_KEY",
 };
 
 interface CreateServiceParams {
@@ -58,10 +58,13 @@ function buildOpenclawConfig(params: {
   botToken?: string;
 }): string {
   const config: Record<string, unknown> = {
+    gateway: {
+      mode: "local",
+    },
     agents: {
       defaults: {
         model: {
-          primary: MODEL_NAMES[params.model] || "claude-sonnet-4-6",
+          primary: MODEL_NAMES[params.model] || "anthropic/claude-sonnet-4-6",
         },
       },
     },
@@ -73,6 +76,7 @@ function buildOpenclawConfig(params: {
       enabled: true,
       botToken: params.botToken || "",
       dmPolicy: "open",
+      allowFrom: ["*"],
     };
   }
 
@@ -85,7 +89,7 @@ export async function createOpenclaw(
   const token = generateToken();
   const projectName = `palclaw-${params.userId.slice(0, 8)}-${Date.now()}`;
   const imageUrl =
-    process.env.RAILWAY_OPENCLAW_IMAGE || "node:22";
+    process.env.RAILWAY_OPENCLAW_IMAGE || "eisukehirata/palclaw-openclaw:latest";
 
   // Build the openclaw.json config, base64-encode to avoid all shell quoting issues
   const configJson = buildOpenclawConfig({
@@ -142,7 +146,8 @@ export async function createOpenclaw(
         numReplicas: 1,
         // sh -c wrapper is required for Railway to execute && chains.
         // Config is base64-encoded to avoid all quoting issues.
-        startCommand: `sh -c "apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/* && npm install -g openclaw@latest && mkdir -p /root/.openclaw && echo $OPENCLAW_CONFIG_B64 | base64 -d > /root/.openclaw/openclaw.json && openclaw gateway --port 18789"`,
+        // Pre-built image already has openclaw installed; CMD handles config decode + doctor + gateway start.
+        // No custom startCommand needed — Railway will use the image's CMD.
       },
     }
   );

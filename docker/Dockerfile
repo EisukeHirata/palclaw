@@ -1,16 +1,26 @@
-FROM node:22-alpine
+FROM node:22
+
+# Force all GitHub git references to use HTTPS (no SSH key needed)
+RUN git config --global url."https://github.com/".insteadOf "ssh://git@github.com/" && \
+    git config --global url."https://github.com/".insteadOf "git@github.com:"
 
 # Install Openclaw globally
-RUN npm install -g openclaw@latest
+RUN npm install -g openclaw@latest && \
+    npm cache clean --force
 
-# Create workspace directories
-RUN mkdir -p /root/.openclaw /root/openclaw/workspace
+# Create all workspace directories that openclaw expects
+RUN mkdir -p /root/.openclaw/agents/main/agent \
+             /root/.openclaw/agents/main/sessions \
+             /root/.openclaw/credentials \
+             /root/.openclaw/logs \
+             /root/openclaw/workspace && \
+    chmod 700 /root/.openclaw
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 WORKDIR /root
 
 EXPOSE 18789
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=90s \
-  CMD wget -q --spider http://localhost:18789 || exit 1
-
-CMD ["openclaw", "gateway", "--port", "18789"]
+CMD ["/entrypoint.sh"]
