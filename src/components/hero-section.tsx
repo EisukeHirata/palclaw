@@ -1,6 +1,46 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+
+const WORDS = [
+  "Self-Improvement",
+  "Career Success",
+  "Language Learning",
+  "Health & Wellness",
+  "Goal Achievement",
+  "Productivity",
+];
+
+function WordRotator() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((current) => (current + 1) % WORDS.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <span className="relative inline-block min-w-[600px] text-center align-bottom h-[1.1em]">
+      {WORDS.map((word, i) => (
+        <span
+          key={word}
+          className={`absolute inset-x-0 top-0 transition-all duration-500 ease-in-out whitespace-nowrap ${
+            i === index
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-8 pointer-events-none"
+          } bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent`}
+        >
+          {word}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 export function HeroSection() {
   return (
@@ -18,11 +58,9 @@ export function HeroSection() {
           🌱 Your Personal Growth Engine
         </Badge>
 
-        <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
+        <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground sm:text-6xl min-h-[1.2em]">
           Meet Your AI Coach for{" "}
-          <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-            Self-Improvement
-          </span>
+          <WordRotator />
         </h1>
 
         <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground sm:text-xl">
